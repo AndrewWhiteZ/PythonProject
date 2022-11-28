@@ -286,23 +286,23 @@ new_dic_cities_salary = {}
 new_dic_cities_ratio = {}
 
 
-file = input('Введите название файла: ')
-profession = input('Введите название профессии: ')
-data = DataSet(file)
-full_dict_list = data.get_full_dict_list()
+def PrintStats():
+    global file, profession, data
+    file = input('Введите название файла: ')
+    profession = input('Введите название профессии: ')
+    data = DataSet(file)
+    full_dict_list = data.get_full_dict_list()
+    print(f'Динамика уровня зарплат по годам: {full_dict_list[0]}')
+    print(f'Динамика количества вакансий по годам: {full_dict_list[1]}')
+    print(f'Динамика уровня зарплат по годам для выбранной профессии: {full_dict_list[2]}')
+    print(f'Динамика количества вакансий по годам для выбранной профессии: {full_dict_list[3]}')
+    print(f'Уровень зарплат по городам (в порядке убывания): {full_dict_list[4]}')
+    print(f'Доля вакансий по городам (в порядке убывания): {full_dict_list[5]}')
+    report = Report({'Статистика по годам': ['Год', 'Средняя зарплата', f'Средняя зарплата - {profession}',
+                                             'Количество вакансий', f'Количество вакансий - {profession}'],
+                     'Статистика по городам': ['Город', 'Уровень зарплат', '', 'Город', 'Доля вакансий']},
+                    Side(style='thin', color="000000"))
+    report.generate_excel(full_dict_list)
+    report.generate_image(full_dict_list)
+    report.generate_pdf()
 
-print(f'Динамика уровня зарплат по годам: {full_dict_list[0]}')
-print(f'Динамика количества вакансий по годам: {full_dict_list[1]}')
-print(f'Динамика уровня зарплат по годам для выбранной профессии: {full_dict_list[2]}')
-print(f'Динамика количества вакансий по годам для выбранной профессии: {full_dict_list[3]}')
-print(f'Уровень зарплат по городам (в порядке убывания): {full_dict_list[4]}')
-print(f'Доля вакансий по городам (в порядке убывания): {full_dict_list[5]}')
-
-report = Report({'Статистика по годам': ['Год', 'Средняя зарплата', f'Средняя зарплата - {profession}',
-                                            'Количество вакансий', f'Количество вакансий - {profession}'],
-                 'Статистика по городам': ['Город', 'Уровень зарплат', '', 'Город', 'Доля вакансий']},
-                Side(style='thin', color="000000"))
-
-report.generate_excel(full_dict_list)
-report.generate_image(full_dict_list)
-report.generate_pdf()
