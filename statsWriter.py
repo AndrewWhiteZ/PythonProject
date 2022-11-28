@@ -12,6 +12,9 @@ import openpyxl as excel
 import pdfkit
 
 currency_to_rub = {
+    """
+    Cловарь коэффицентов конвертации валют в рубли
+    """
     "AZN": 35.68,
     "BYR": 23.91,
     "EUR": 59.90,
@@ -25,6 +28,9 @@ currency_to_rub = {
 }
 
 dic_naming = {
+    """
+    Словарь перевода английских названий заголовков в русские
+    """
     'name': 'Название',
     'salary': 'Оклад',
     'salary_from': 'Нижняя граница вилки оклада',
@@ -36,6 +42,11 @@ dic_naming = {
 
 
 def format_columns_width(worksheet):
+    """
+    Устанавливает ширину стоблцов рабочего листа по длине содержимого ячеек
+    Args:
+        worksheet (excel.worksheet): Рабочий лист excel-документа
+    """
     dims = {}
     for row in worksheet.rows:
         for cell in row:
@@ -47,6 +58,13 @@ def format_columns_width(worksheet):
 
 
 def set_header(worksheet, columns_title, bd):
+    """
+    Задает стили границ и записывает заголовки в первую строку рабочего листа
+    Args:
+        worksheet (excel.worksheet): Рабочий лист excel-документа
+        columns_title (list of string): Список заголовков листа
+        bd (excel.border_style): Стиль границ для ячеек заголовков
+    """
     for index, title in enumerate(columns_title):
         cell = worksheet.cell(column=index + 1, row=1, value=title)
         if title:
@@ -55,6 +73,17 @@ def set_header(worksheet, columns_title, bd):
 
 
 def write_data(worksheet, data, bd, first_col_number=1, first_row_number=2, percentage_col_number=-1):
+    """
+    Задает стили границ и записывает данные в виде таблицы начиная с указанных колонки и строки
+    Args:
+        worksheet (excel.worksheet): Рабочий лист excel-документа
+        data (list of lists of float or integer): Список выводимых данных
+        bd (excel.border_style): Стиль границ для ячеек данных
+        first_col_number: Порядковый номер колонки, с которой начинается запись данных
+        first_row_number: Порядковый номер строки, с которой начинается запись данных
+        percentage_col_number: Порядковый номер столбца, которому нужно установить процентный значения
+    """
+
     for i, row in enumerate(data):
         for j, value in enumerate(row):
             cell = worksheet.cell(column=j + first_col_number, row=i + first_row_number, value=data[i][j])
@@ -64,11 +93,29 @@ def write_data(worksheet, data, bd, first_col_number=1, first_row_number=2, perc
 
 
 class Report(object):
+    """
+    Класс для представления отчёта полученной статистики
+
+    Attributes:
+        ws_titles_list (list of strings): Список названий рабочих листов excel-документа
+        border_style (excel.border_style): Стиль границ для ячеек excel-документа
+    """
     def __init__(self, ws_titles_list, border_style):
+        """
+        Инициализирует объект Report
+        Args:
+            ws_titles_list (list of strings): Список названий рабочих листов excel-документа
+            border_style (excel.border_style): Стиль границ для ячеек excel-документа
+        """
         self.ws_titles_headers = ws_titles_list
         self.border_style = border_style
 
     def generate_excel(self, dic_list):
+        """
+        Генерирует excel-документ со списком получаемых статистических данных
+        Args:
+            dic_list (list of dictionaries): Список словарей статистических даннных для всех профессий и городов
+        """
         wb = excel.Workbook()
         ws_list = []
         bd = self.border_style
@@ -105,6 +152,11 @@ class Report(object):
         wb.save('report.xlsx')
 
     def generate_image(self, dic_list):
+        """
+        Формирует png-изображение диаграмм по полученным статистическим данным
+        Args:
+            dic_list (list of dictionaries): Список словарей статистических даннных для всех профессий и городов
+        """
         plt.rc('axes', labelsize=8)
         plt.rc('xtick', labelsize=8)
         plt.rc('ytick', labelsize=8)
@@ -152,6 +204,9 @@ class Report(object):
         plt.savefig(r"C:\Users\Andrew\PycharmProjects\YandexContest2\graph.png", dpi=200)
 
     def generate_pdf(self):
+        """
+        Формирует pdf-документ с таблицамии и диаграммами
+        """
         env = Environment(loader=FileSystemLoader('.'))
         template = env.get_template("html_template.html")
         book = load_workbook("report.xlsx")
@@ -162,18 +217,58 @@ class Report(object):
 
 
 class Salary(object):
+    """
+    Класс для представления зарплаты
+
+    Attributes:
+        salary_from (int or float): Нижняя граница вилки оклада
+        salary_to (int or float): Верхняя граница вилки оклада
+        salary_gross (str): Указатель размера оклада с учетом налогов
+        salary_currency (str): Валюта оклада
+    """
     def __init__(self, salary_f, salary_t, salary_c, salary_g='Нет'):
+        """
+        Инициализирует объект Salary
+        Args:
+            salary_f (int or float): Нижняя граница вилки оклада
+            salary_t (int or float): Верхняя граница вилки оклада
+            salary_g (str): Указатель размера оклада с учетом налогов
+            salary_c (str): Валюта оклада
+        """
         self.salary_from = salary_f
         self.salary_to = salary_t
         self.salary_gross = salary_g
         self.salary_currency = salary_c
 
     def convert(self):
+        """
+        Конвертирует значение зарплаты в валюте в рубли
+        Returns: int: Конвертированное значение зарплаты в рублях
+        """
         return (int(float(self.salary_from)) + int(float(self.salary_to))) / 2 * currency_to_rub[self.salary_currency]
 
 
 class Vacancy(object):
+    """
+    Класс для представления вакансии
+
+    Attributes:
+        name (str): Название вакансии
+        salary (Salary object): Зарплата
+        area_name (str): Название региона
+        published_at (str): Дата публикации вакансии
+        description (str): Описание вакансии
+        key_skills (list of str): Список необходимых навыков
+        premium (str): Указатель премиум-вакансии
+        employer_name (str): Название компании работодателя
+        experience_id (str): Опыт работы
+    """
     def __init__(self, vacancy_row):
+        """
+        Инициализирует объект вакансии
+        Args:
+            vacancy_row (list of parameters): Список параметров вакансии
+        """
         if len(vacancy_row) == 6:
             self.name = vacancy_row[0]
             self.salary = Salary(vacancy_row[1], vacancy_row[2], vacancy_row[3])
@@ -192,7 +287,18 @@ class Vacancy(object):
 
 
 class DataSet(object):
+    """
+    Класс для представления датасета
+
+    Attributes:
+        vacancies (list of Vacancy objects): Список вакансий датасета
+    """
     def __init__(self, file_path):
+        """
+        Инициализирует объект датасета
+        Args:
+            file_path (str): Путь к csv-файлу с данными о вакансиях
+        """
         vacancies_objs = []
         with open(file_path, encoding="utf-8-sig") as File:
             if os.stat(file).st_size == 0:
@@ -214,6 +320,12 @@ class DataSet(object):
 
     # Получаем датасет распределения зарплаты по годам
     def salary_by_year(self):
+        """
+        Формирует датасет распределения зарплат по годам
+        Returns:
+            list of dict: Список из двух словарей: распределение зарплат по годам
+            и распределение кол-ва вакансий по годам
+        """
         for vacancy in self.vacancies:
             if int(vacancy.published_at[:4]) not in list(dic_salaries.keys()):
                 dic_salaries.update({int(vacancy.published_at[:4]): 0})
@@ -228,6 +340,12 @@ class DataSet(object):
 
     # Получаем датасет распределения зарплаты по профессиям
     def salary_by_profession(self):
+        """
+        Формирует датасет распределения зарплат по профессиям
+        Returns:
+            list of dict: Список из двух словарей: распределение зарплат по профессиям и
+            распределение кол-ва вакансий по профессиям
+        """
         for vacancy in self.vacancies:
             if profession in vacancy.name:
                 if int(vacancy.published_at[:4]) not in list(dic_salaries_by_profession.keys()):
@@ -249,6 +367,12 @@ class DataSet(object):
 
     # Получаем датасет распределения зарплаты по городам
     def salary_by_area(self):
+        """
+        Формирует датасет распределения зарплат по городам
+        Returns:
+            list of dict: Список из двух отсортированных по убыванию словарей: распределение зарплат по городам и
+            распределение кол-ва вакансий по городам
+        """
         for vacancy in self.vacancies:
             if vacancy.area_name not in list(dic_cities_salary.keys()):
                 dic_cities_salary.update({vacancy.area_name: 0})
@@ -271,6 +395,13 @@ class DataSet(object):
                 dict(itertools.islice(sorted(dic_cities_ratio.items(), key=lambda item: item[1], reverse=True), 10))]
 
     def get_full_dict_list(self):
+        """
+        Объединяет датасеты распределения зарплат по годам, распределения зарплат по профессиям и
+        распределения зарплат по городам
+        Returns:
+            list of dict: Датасет, образованный объединением трёх датасетов распределения зарплат по годам,
+            распределения зарплат по профессиям и распределения зарплат по городам
+        """
         return data.salary_by_year() + data.salary_by_profession() + data.salary_by_area()
 
 
@@ -287,6 +418,10 @@ new_dic_cities_ratio = {}
 
 
 def PrintStats():
+    """
+    Создает excel-документ с статистическими данными, png-изображение с диаграммами и pdf-документ с
+    таблицами и диаграммами
+    """
     global file, profession, data
     file = input('Введите название файла: ')
     profession = input('Введите название профессии: ')

@@ -6,79 +6,127 @@ import os
 
 invert_dic = lambda dic: {v: k for k, v in dic.items()}
 
-dic_naming = {'name': 'Название',
-              'description': 'Описание',
-              'key_skills': 'Навыки',
-              'experience_id': 'Опыт работы',
-              'premium': 'Премиум-вакансия',
-              'employer_name': 'Компания',
-              'salary': 'Оклад',
-              'salary_from': 'Нижняя граница вилки оклада',
-              'salary_to': 'Верхняя граница вилки оклада',
-              'salary_gross': 'Оклад указан до вычета налогов',
-              'salary_currency': 'Идентификатор валюты оклада',
-              'area_name': 'Название региона',
-              'published_at': 'Дата публикации вакансии'}
+dic_naming = {
+    """
+    Словарь перевода английских названий заголовков в русские
+    """
+    'name': 'Название',
+    'description': 'Описание',
+    'key_skills': 'Навыки',
+    'experience_id': 'Опыт работы',
+    'premium': 'Премиум-вакансия',
+    'employer_name': 'Компания',
+    'salary': 'Оклад',
+    'salary_from': 'Нижняя граница вилки оклада',
+    'salary_to': 'Верхняя граница вилки оклада',
+    'salary_gross': 'Оклад указан до вычета налогов',
+    'salary_currency': 'Идентификатор валюты оклада',
+    'area_name': 'Название региона',
+    'published_at': 'Дата публикации вакансии'
+}
 
-dic_bool = {'True': 'Да',
-            'TRUE': 'Да',
-            'False': 'Нет',
-            'FALSE': 'Нет'}
+dic_bool = {
+    """
+    Словарь перевода английских логических значений в русские
+    """
+    'True': 'Да',
+    'TRUE': 'Да',
+    'False': 'Нет',
+    'FALSE': 'Нет'
+}
 
-dic_work_experience = {'noExperience': 'Нет опыта',
-                       'between1And3': 'От 1 года до 3 лет',
-                       'between3And6': 'От 3 до 6 лет',
-                       'moreThan6': 'Более 6 лет'}
+dic_work_experience = {
+    """
+    Словарь перевода английских указателей опыта работы в русские
+    """
+    'noExperience': 'Нет опыта',
+    'between1And3': 'От 1 года до 3 лет',
+    'between3And6': 'От 3 до 6 лет',
+    'moreThan6': 'Более 6 лет'
+}
 
-work_experience_sort = {'Нет опыта': 0,
-                        'От 1 года до 3 лет': 1,
-                        'От 3 до 6 лет': 2,
-                        'Более 6 лет': 3}
+work_experience_sort = {
+    """
+    Словарь сортировки указателей опыта работы
+    """
+    'Нет опыта': 0,
+    'От 1 года до 3 лет': 1,
+    'От 3 до 6 лет': 2,
+    'Более 6 лет': 3
+}
 
-dic_currency = {'AZN': 'Манаты',
-                'BYR': 'Белорусские рубли',
-                'EUR': 'Евро',
-                'GEL': 'Грузинский лари',
-                'KGS': 'Киргизский сом',
-                'KZT': 'Тенге',
-                'RUR': 'Рубли',
-                'UAH': 'Гривны',
-                'USD': 'Доллары',
-                'UZS': 'Узбекский сум'}
+dic_currency = {
+    """
+    Словарь перевода кода валюты в полное название
+    """
+    'AZN': 'Манаты',
+    'BYR': 'Белорусские рубли',
+    'EUR': 'Евро',
+    'GEL': 'Грузинский лари',
+    'KGS': 'Киргизский сом',
+    'KZT': 'Тенге',
+    'RUR': 'Рубли',
+    'UAH': 'Гривны',
+    'USD': 'Доллары',
+    'UZS': 'Узбекский сум'
+}
 
-currency_to_rub = {"AZN": 35.68,
-                   "BYR": 23.91,
-                   "EUR": 59.90,
-                   "GEL": 21.74,
-                   "KGS": 0.76,
-                   "KZT": 0.13,
-                   "RUR": 1,
-                   "UAH": 1.64,
-                   "USD": 60.66,
-                   "UZS": 0.0055}
+currency_to_rub = {
+    """
+    Cловарь коэффицентов конвертации валют в рубли
+    """
+    "AZN": 35.68,
+    "BYR": 23.91,
+    "EUR": 59.90,
+    "GEL": 21.74,
+    "KGS": 0.76,
+    "KZT": 0.13,
+    "RUR": 1,
+    "UAH": 1.64,
+    "USD": 60.66,
+    "UZS": 0.0055
+}
 
-dic_filters = {'Название': lambda x, y: x == y,
-               'Описание': lambda x, y: x == y,
-               'Навыки': lambda x, y: all(t in x for t in y),
-               'Опыт работы': lambda x, y: x == y,
-               'Премиум-вакансия': lambda x, y: x == y,
-               'Компания': lambda x, y: x == y,
-               'Оклад': lambda salary_from, salary_to, x: salary_from <= x <= salary_to,
-               'Оклад указан до вычета налогов': lambda x, y: x == y,
-               'Идентификатор валюты оклада': lambda x, y: x == y,
-               'Название региона': lambda x, y: x == y,
-               'Дата публикации вакансии': lambda yi, mi, di, dt, mt, yt: di == dt and mi == mt and yi == yt}
+dic_filters = {
+    """
+    Словарь функций фильтрации для парметров вакансии
+    """
+    'Название': lambda x, y: x == y,
+    'Описание': lambda x, y: x == y,
+    'Навыки': lambda x, y: all(t in x for t in y),
+    'Опыт работы': lambda x, y: x == y,
+    'Премиум-вакансия': lambda x, y: x == y,
+    'Компания': lambda x, y: x == y,
+    'Оклад': lambda salary_from, salary_to, x: salary_from <= x <= salary_to,
+    'Оклад указан до вычета налогов': lambda x, y: x == y,
+    'Идентификатор валюты оклада': lambda x, y: x == y,
+    'Название региона': lambda x, y: x == y,
+    'Дата публикации вакансии': lambda yi, mi, di, dt, mt, yt: di == dt and mi == mt and yi == yt
+}
 
-dic_sorters = {'Навыки': lambda x: len(x.full_dict['key_skills'].split('\n')),
-               'Опыт работы': lambda x: work_experience_sort[dic_work_experience[x.full_dict['experience_id']]],
-               'Оклад': lambda x: x.full_dict['salary'].converter(),
-               'Дата публикации вакансии': lambda x: int(
-                   x.full_dict['published_at'][:4] + x.full_dict['published_at'][5:7] +
-                   x.full_dict['published_at'][8:10] + x.full_dict['published_at'][11:13] +
-                   x.full_dict['published_at'][14:16] + x.full_dict['published_at'][17:19])}
+dic_sorters = {
+    """
+    Словарь функций сортировки для параметров вакансии
+    """
+    'Навыки': lambda x: len(x.full_dict['key_skills'].split('\n')),
+    'Опыт работы': lambda x: work_experience_sort[dic_work_experience[x.full_dict['experience_id']]],
+    'Оклад': lambda x: x.full_dict['salary'].converter(),
+    'Дата публикации вакансии': lambda x: int(
+       x.full_dict['published_at'][:4] + x.full_dict['published_at'][5:7] +
+       x.full_dict['published_at'][8:10] + x.full_dict['published_at'][11:13] +
+       x.full_dict['published_at'][14:16] + x.full_dict['published_at'][17:19])
+}
 
 
 def check_filter_value(filter_opt):
+    """
+    Проверяет значение параметра фильтрации на соответствие требованиям
+    Args:
+        filter_opt (str): Значение параматра фильтрации
+
+    Returns:
+        str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+    """
     if filter_opt != '':
         if ':' not in filter_opt:
             return "Формат ввода некорректен"
@@ -88,18 +136,43 @@ def check_filter_value(filter_opt):
 
 
 def check_sorter_value(sorter):
+    """
+    Проверяет значение параметра сортировки на соответствие требованиям
+    Args:
+        sorter (str): Значение параматра сортировки
+
+    Returns:
+        str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+    """
     if sorter != '' and sorter not in dic_naming.values():
         return "Параметр сортировки некорректен"
     return False
 
 
 def check_reverse_value(reverse_sort):
+    """
+    Проверяет значение параметра обратной сортировки на соответствие требованиям
+    Args:
+        reverse_sort (str): Значение параматра обратной сортировки
+
+    Returns:
+        str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+    """
     if reverse_sort != '' and reverse_sort not in ['Да', 'Нет']:
         return "Порядок сортировки задан некорректно"
     return False
 
 
 def formatter(row, key):
+    """
+    Форматирует строковое значение параметра вакансии в соответствии с правилами для каждого столбца
+    Args:
+        row(str): Строковое значение параметра вакансии
+        key(str): Указатель названия столбца, к которому относится строковое значение
+
+    Returns:
+        str: Отформатированное строковое значение параметра вакансии
+    """
     shrink_long_row = lambda string: string[:100] + '...' if len(string) > 100 else string
     if key == 'name':
         row.strip()
@@ -149,7 +222,27 @@ class Salary(object):
 
 
 class Vacancy(object):
+    """
+    Класс для представления вакансии
+
+    Attributes:
+        full_dict (dict): Полный словарь из названий парметров и значений параметров
+        name (str): Название вакансии
+        salary (Salary object): Зарплата
+        area_name (str): Название региона
+        published_at (str): Дата публикации вакансии
+        description (str): Описание вакансии
+        key_skills (list of str): Список необходимых навыков
+        premium (str): Указатель премиум-вакансии
+        employer_name (str): Название компании работодателя
+        experience_id (str): Опыт работы
+    """
     def __init__(self, vacancy_row):
+        """
+        Инициализирует объект Vacancy
+        Args:
+            vacancy_row(list of str or int): Список параметров вакансии
+        """
         self.full_dict = dict({
             'name': vacancy_row[0],
             'description': vacancy_row[1],
@@ -177,7 +270,18 @@ class Vacancy(object):
 
 
 class DataSet(object):
+    """
+    Класс для представления датасета
+
+    Attributes:
+        vacancies (list of Vacancy objects): Список вакансий датасета
+    """
     def __init__(self, file_path):
+        """
+        Инициализирует объект датасета
+        Args:
+            file_path (str): Путь к csv-файлу с данными о вакансиях
+        """
         vacancies_objs = []
         with open(file_path, encoding="utf-8-sig") as File:
             if os.stat(file_path).st_size == 0:
@@ -199,6 +303,11 @@ class DataSet(object):
                 self.vacancies = vacancies_objs
 
     def filter_data(self, filter_opt):
+        """
+        Фильтрует список вакансий по заданному условию
+        Args:
+            filter_opt(str): Значение параметра фильтрации
+        """
         filter_key = filter_opt.split(': ')[0]
         filter_value = filter_opt.split(': ')[1]
         if filter_key == 'Оклад':
@@ -251,8 +360,13 @@ class DataSet(object):
         if len(self.vacancies) == 0:
             self.vacancies = 'Ничего не найдено'
 
-
     def sorter_data(self, sorter_opt, is_reverse):
+        """
+        Сортирует список вакансий по заданному условию
+        Args:
+            sorter_opt (str): Значение параметра сортировки
+            is_reverse (str): Значение параметра обратной сортировки
+        """
         is_reverse_sorter = is_reverse == 'Да'
 
         if sorter_opt in ['Название', 'Описание', 'Компания', 'Название региона',
@@ -264,7 +378,20 @@ class DataSet(object):
 
 
 class InputConect(object):
+    """
+    Класс для вывода полученного списка вакансий в виде таблицы
+    """
     def __init__(self, file_path, filter_opt, sorter_opt, is_reverse, split_r, columns_r):
+        """
+        Инициализирует объект InputConect
+        Args:
+            file_path (str): Путь к csv-файлу с данными о вакансиях
+            filter_opt (str): Значение параметра фильтрации
+            sorter_opt (str): Значение параметра сортировки
+            is_reverse (str): Значение параметра обратной сортировки
+            split_r (list of two int): Нумерованные границы строк, которые должны быть выведены
+            columns_r: Список названий столбцов, которые должны быть выведены
+        """
         if check_filter_value(filter_opt):
             print(check_filter_value(filter_opt))
         elif check_sorter_value(sorter_opt):
@@ -272,7 +399,7 @@ class InputConect(object):
         elif check_reverse_value(is_reverse):
             print(check_reverse_value(is_reverse))
         else:
-            data = DataSet(file_path, )
+            data = DataSet(file_path)
             if data.vacancies in ['Нет данных', 'Пустой файл']:
                 print(data.vacancies)
             else:
@@ -327,6 +454,10 @@ table.hrules = ALL
 vacancies = []
 
 def PrintTable():
+    """
+    Выводит данные о вакансиях в виде таблицы в соответствии с заданными параметрами фильтрации,
+    сортировки и обратной сортировки
+    """
     file = input('Введите название файла: ')
     filter_option = input('Введите параметр фильтрации: ')
     sorter_option = input('Введите параметр сортировки: ')
@@ -335,7 +466,5 @@ def PrintTable():
     columns_range = input('Введите требуемые столбцы: ').split(', ')
 
     inputConnect = InputConect(file, filter_option, sorter_option, is_reverse_sort, split_range, columns_range)
-
-
 
 # Код из задачи 5.2
