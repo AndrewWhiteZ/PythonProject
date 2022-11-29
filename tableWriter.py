@@ -6,10 +6,8 @@ import os
 
 invert_dic = lambda dic: {v: k for k, v in dic.items()}
 
+# Словарь перевода английских названий заголовков в русские
 dic_naming = {
-    """
-    Словарь перевода английских названий заголовков в русские
-    """
     'name': 'Название',
     'description': 'Описание',
     'key_skills': 'Навыки',
@@ -25,40 +23,32 @@ dic_naming = {
     'published_at': 'Дата публикации вакансии'
 }
 
+# Словарь перевода английских логических значений в русские
 dic_bool = {
-    """
-    Словарь перевода английских логических значений в русские
-    """
     'True': 'Да',
     'TRUE': 'Да',
     'False': 'Нет',
     'FALSE': 'Нет'
 }
 
+# Словарь перевода английских указателей опыта работы в русские
 dic_work_experience = {
-    """
-    Словарь перевода английских указателей опыта работы в русские
-    """
     'noExperience': 'Нет опыта',
     'between1And3': 'От 1 года до 3 лет',
     'between3And6': 'От 3 до 6 лет',
     'moreThan6': 'Более 6 лет'
 }
 
+# Словарь сортировки указателей опыта работы
 work_experience_sort = {
-    """
-    Словарь сортировки указателей опыта работы
-    """
     'Нет опыта': 0,
     'От 1 года до 3 лет': 1,
     'От 3 до 6 лет': 2,
     'Более 6 лет': 3
 }
 
+# Словарь перевода кода валюты в полное название
 dic_currency = {
-    """
-    Словарь перевода кода валюты в полное название
-    """
     'AZN': 'Манаты',
     'BYR': 'Белорусские рубли',
     'EUR': 'Евро',
@@ -71,10 +61,8 @@ dic_currency = {
     'UZS': 'Узбекский сум'
 }
 
+# Cловарь коэффицентов конвертации валют в рубли
 currency_to_rub = {
-    """
-    Cловарь коэффицентов конвертации валют в рубли
-    """
     "AZN": 35.68,
     "BYR": 23.91,
     "EUR": 59.90,
@@ -87,10 +75,8 @@ currency_to_rub = {
     "UZS": 0.0055
 }
 
+# Словарь функций фильтрации для парметров вакансии
 dic_filters = {
-    """
-    Словарь функций фильтрации для парметров вакансии
-    """
     'Название': lambda x, y: x == y,
     'Описание': lambda x, y: x == y,
     'Навыки': lambda x, y: all(t in x for t in y),
@@ -104,10 +90,8 @@ dic_filters = {
     'Дата публикации вакансии': lambda yi, mi, di, dt, mt, yt: di == dt and mi == mt and yi == yt
 }
 
+# Словарь функций сортировки для параметров вакансии
 dic_sorters = {
-    """
-    Словарь функций сортировки для параметров вакансии
-    """
     'Навыки': lambda x: len(x.full_dict['key_skills'].split('\n')),
     'Опыт работы': lambda x: work_experience_sort[dic_work_experience[x.full_dict['experience_id']]],
     'Оклад': lambda x: x.full_dict['salary'].converter(),
@@ -126,6 +110,17 @@ def check_filter_value(filter_opt):
 
     Returns:
         str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+
+    >>> check_filter_value('Название')
+    'Формат ввода некорректен'
+    >>> check_filter_value('НеверныйЗаголовок')
+    'Формат ввода некорректен'
+    >>> check_filter_value('Название: 1С-программист')
+    False
+    >>> check_filter_value('Неверный заголовок: 1С-программист')
+    'Параметр поиска некорректен'
+    >>> check_filter_value('Опыт работы: Без опыта')
+    False
     """
     if filter_opt != '':
         if ':' not in filter_opt:
@@ -143,6 +138,13 @@ def check_sorter_value(sorter):
 
     Returns:
         str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+
+    >>> check_sorter_value('Название')
+    False
+    >>> check_sorter_value('')
+    False
+    >>> check_sorter_value('НеверныйЗаголовок')
+    'Параметр сортировки некорректен'
     """
     if sorter != '' and sorter not in dic_naming.values():
         return "Параметр сортировки некорректен"
@@ -157,6 +159,13 @@ def check_reverse_value(reverse_sort):
 
     Returns:
         str or bool: Найденная ошибка или False, если введенный параметр выполняет требования
+
+    >>> check_reverse_value('Да')
+    False
+    >>> check_reverse_value('')
+    False
+    >>> check_reverse_value('НеверноеЗначение')
+    'Порядок сортировки задан некорректно'
     """
     if reverse_sort != '' and reverse_sort not in ['Да', 'Нет']:
         return "Порядок сортировки задан некорректно"
@@ -172,7 +181,19 @@ def formatter(row, key):
 
     Returns:
         str: Отформатированное строковое значение параметра вакансии
+        
+    >>> formatter('  Программист 1С'   , 'name')
+    'Программист 1С'
+    >>> formatter('<p>Описание Вакансии</p>', 'description')
+    'Описание Вакансии'
+    >>> formatter('between1And3', 'experience_id')
+    'От 1 года до 3 лет'
+    >>> formatter('FALSE', 'premium')
+    'Нет'
+    >>> formatter('2022-07-05T18:31:44+0300', 'published_at')
+    '05.07.2022'
     """
+
     shrink_long_row = lambda string: string[:100] + '...' if len(string) > 100 else string
     if key == 'name':
         row.strip()
@@ -209,7 +230,37 @@ def formatter(row, key):
 
 
 class Salary(object):
+    """
+    Класс для представления зарплаты
+    Attributes:
+        salary_from (int or float): Нижняя граница вилки оклада
+        salary_to (int or float): Верхняя граница вилки оклада
+        salary_gross (str): Указатель размера оклада с учетом налогов
+        salary_currency (str): Валюта оклада
+        salary_to_print (str): Отформатированная строка зарплаты для печати
+    """
     def __init__(self, salary_f, salary_t, salary_g, salary_c):
+        """
+        Инициализирует объект Salary
+        Args:
+            salary_f (int or float): Нижняя граница вилки оклада
+            salary_t (int or float): Верхняя граница вилки оклада
+            salary_g (str): Указатель размера оклада с учетом налогов
+            salary_c (str): Валюта оклада
+
+        >>> type(Salary(10.0, 20.4, 'False', 'RUR')).__name__
+        'Salary'
+        >>> type(Salary(100, 200, 'False', 'EUR')).__name__
+        'Salary'
+        >>> Salary(10.0, 20.4, 'False', 'RUR').salary_from
+        10.0
+        >>> Salary(10.0, 20.4, 'False', 'RUR').salary_to
+        20.4
+        >>> Salary(10.0, 20.4, 'False', 'RUR').salary_currency
+        'RUR'
+        >>> Salary(10.0, 20.4, 'False', 'RUR').salary_gross
+        'False'
+        """
         self.salary_from = salary_f
         self.salary_to = salary_t
         self.salary_gross = salary_g
@@ -217,6 +268,23 @@ class Salary(object):
         self.salary_to_print = formatter(self, 'salary')
 
     def converter(self):
+        """
+        Конвертирует значение зарплаты в валюте в рубли
+        Returns: int: Конвертированное значение зарплаты в рублях
+
+        >>> Salary(10, 20, 'False', 'RUR').converter()
+        15
+        >>> Salary(10, 20, 'False', 'EUR').converter()
+        898
+        >>> Salary(10, 20, 'False', 'RUR').converter()
+        15
+        >>> Salary(10.0, 20.0, 'False', 'RUR').converter()
+        15
+        >>> Salary(10.0, 20.0, 'False', 'EUR').converter()
+        898
+        >>> Salary(10.0, 20.0, 'False', 'RUR').converter()
+        15
+        """
         return int(round(currency_to_rub[self.salary_currency] *
                          (int(float(self.salary_from) + (int(float(self.salary_to))))) / 2))
 
@@ -238,10 +306,31 @@ class Vacancy(object):
         experience_id (str): Опыт работы
     """
     def __init__(self, vacancy_row):
-        """
+        r"""
         Инициализирует объект Vacancy
         Args:
             vacancy_row(list of str or int): Список параметров вакансии
+
+        >>> type(Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300'])).__name__
+        'Vacancy'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'True', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).name
+        'Оператор сервисного центра'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).description
+        'Необходимо отвечать на звонки клиентов и решать их проблемы'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).key_skills
+        'Ответственность\nКоммуникабельность'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'True', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).experience_id
+        'Нет опыта'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).premium
+        'Нет'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).employer_name
+        'ОАО "Информационные технологии"'
+        >>> type(Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).salary)
+        <class 'str'>
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).area_name
+        'Екатеринбург'
+        >>> Vacancy(['Оператор сервисного центра', 'Необходимо отвечать на звонки клиентов и решать их проблемы', 'Ответственность\nКоммуникабельность', 'noExperience', 'False', 'ОАО "Информационные технологии"', 20000, 30000, 'False', 'RUR', 'Екатеринбург', '2022-07-15T09:56:52+0300']).published_at
+        '15.07.2022'
         """
         self.full_dict = dict({
             'name': vacancy_row[0],
@@ -281,7 +370,11 @@ class DataSet(object):
         Инициализирует объект датасета
         Args:
             file_path (str): Путь к csv-файлу с данными о вакансиях
+
+        >>> type(DataSet('vacancies.csv')).__name__
+        'DataSet'
         """
+
         vacancies_objs = []
         with open(file_path, encoding="utf-8-sig") as File:
             if os.stat(file_path).st_size == 0:
