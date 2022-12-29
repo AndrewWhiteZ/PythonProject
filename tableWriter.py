@@ -374,7 +374,7 @@ class DataSet(object):
         >>> type(DataSet('vacancies.csv')).__name__
         'DataSet'
         """
-
+        vacancies = []
         vacancies_objs = []
         with open(file_path, encoding="utf-8-sig") as File:
             if os.stat(file_path).st_size == 0:

@@ -1,3 +1,4 @@
+import datetime
 import math
 import os
 import csv
@@ -10,6 +11,8 @@ from openpyxl.styles import Border, Side, Font
 from openpyxl.styles.numbers import FORMAT_PERCENTAGE_00
 import openpyxl as excel
 import pdfkit
+import _strptime
+import cProfile
 
 currency_to_rub = {
     """
@@ -278,6 +281,17 @@ class Salary(object):
         """
         return (int(float(self.salary_from)) + int(float(self.salary_to))) / 2 * currency_to_rub[self.salary_currency]
 
+class Date(object):
+    def __init__(self, date_row):
+        self.full_date = _strptime.datetime_date(date_row)
+        self.year = date_row[:4]
+        self.month = date_row[5:7]
+        self.day = date_row[8:10]
+        self.hours = date_row[11:13]
+        self.minutes = date_row[14:16]
+        self.seconds = date_row[17:19]
+        self.UTC = date_row[19:]
+
 
 class Vacancy(object):
     """
@@ -336,7 +350,7 @@ class Vacancy(object):
             self.name = vacancy_row[0]
             self.salary = Salary(vacancy_row[1], vacancy_row[2], vacancy_row[3])
             self.area_name = vacancy_row[4]
-            self.published_at = vacancy_row[5]
+            self.published_at = Date(vacancy_row[5])
         else:
             self.name = vacancy_row[0]
             self.description = vacancy_row[1]
@@ -346,7 +360,7 @@ class Vacancy(object):
             self.employer_name = vacancy_row[5]
             self.salary = Salary(vacancy_row[6], vacancy_row[7], vacancy_row[9], vacancy_row[8])
             self.area_name = vacancy_row[10]
-            self.published_at = vacancy_row[11]
+            self.published_at = Date(vacancy_row[11])
 
 
 class DataSet(object):
@@ -393,11 +407,11 @@ class DataSet(object):
             и распределение кол-ва вакансий по годам
         """
         for vacancy in self.vacancies:
-            if int(vacancy.published_at[:4]) not in list(dic_salaries.keys()):
-                dic_salaries.update({int(vacancy.published_at[:4]): 0})
-                dic_counter.update({int(vacancy.published_at[:4]): 0})
-            dic_salaries[int(vacancy.published_at[:4])] += vacancy.salary.convert()
-            dic_counter[int(vacancy.published_at[:4])] += 1
+            if int(vacancy.published_at.year) not in list(dic_salaries.keys()):
+                dic_salaries.update({vacancy.published_at.year: 0})
+                dic_counter.update({vacancy.published_at.year: 0})
+            dic_salaries[vacancy.published_at.year] += vacancy.salary.convert()
+            dic_counter[vacancy.published_at.year] += 1
         self.years = (dic_salaries.keys())
         for year in self.years:
             dic_salaries.update({year: math.floor(dic_salaries[year] / dic_counter[year])})
@@ -414,11 +428,11 @@ class DataSet(object):
         """
         for vacancy in self.vacancies:
             if profession in vacancy.name:
-                if int(vacancy.published_at[:4]) not in list(dic_salaries_by_profession.keys()):
-                    dic_salaries_by_profession.update({int(vacancy.published_at[:4]): 0})
-                    dic_counter_by_profession.update({int(vacancy.published_at[:4]): 0})
-                dic_salaries_by_profession[int(vacancy.published_at[:4])] += vacancy.salary.convert()
-                dic_counter_by_profession[int(vacancy.published_at[:4])] += 1
+                if int(vacancy.published_at.year) not in list(dic_salaries_by_profession.keys()):
+                    dic_salaries_by_profession.update({vacancy.published_at.year: 0})
+                    dic_counter_by_profession.update({vacancy.published_at.year: 0})
+                dic_salaries_by_profession[vacancy.published_at.year] += vacancy.salary.convert()
+                dic_counter_by_profession[vacancy.published_at.year] += 1
         if len(dic_salaries_by_profession) == 0:
             dic_salaries_by_profession.clear()
             dic_counter_by_profession.clear()
