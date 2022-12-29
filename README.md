@@ -1,4 +1,12 @@
 # PythonProject
+
+Вывод частотности каждой валюты
+
+![image](https://user-images.githubusercontent.com/98341388/209951709-e90f20ee-03e1-49f7-9392-03fa1035f1c4.png)
+
+
+#
+
 Тестирование файла табличного вывода данных с помощью Unittest
 
 ![image](https://user-images.githubusercontent.com/98341388/204642456-eaa0e45c-bf10-4b2b-9aaa-3cdcacbe51b6.png)
