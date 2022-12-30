@@ -1,5 +1,9 @@
 # PythonProject
 
+**100 первых вакансий с конертированной зарплатой**
+
+![image](https://user-images.githubusercontent.com/98341388/210036752-ec54ad3e-97ca-4804-927d-c77be592e32b.png)
+
 **Вывод частотности каждой валюты**
 
 ![image](https://user-images.githubusercontent.com/98341388/209951709-e90f20ee-03e1-49f7-9392-03fa1035f1c4.png)
