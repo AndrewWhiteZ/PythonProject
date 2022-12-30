@@ -9,4 +9,4 @@ def split_years(vacancies):
 
 res = split_years(vacancies)
 for df in res:
-    df.to_csv("../chunks/" + df['published_at'].iat[0][:4] + ".csv", encoding='utf-8', index=False)
+    df.to_csv("../new_chunks/" + df['published_at'].iat[0][:4] + ".csv", encoding='utf-8', index=False)
